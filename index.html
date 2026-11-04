@@ -10,13 +10,11 @@
 </head>
 <body>
 <header class="sky" id="sky">
-  <div class="stars" aria-hidden="true"></div>
-  <div class="sun" aria-hidden="true"></div>
-  <svg class="ridges" viewBox="0 0 1440 320" preserveAspectRatio="none" aria-hidden="true">
-    <path class="r1" d="M0 190 L140 120 L260 170 L420 70 L560 150 L700 95 L860 165 L1010 80 L1160 150 L1300 105 L1440 160 L1440 320 L0 320Z"/>
-    <path class="r2" d="M0 240 L180 175 L330 225 L500 160 L690 230 L880 170 L1060 230 L1240 180 L1440 225 L1440 320 L0 320Z"/>
-    <path class="r3" d="M0 290 L240 250 L480 280 L760 245 L1040 282 L1280 255 L1440 275 L1440 320 L0 320Z"/>
-  </svg>
+  <!-- 画面都是 GPT 出的图层：天空、太阳、山、主图。代码只摆位置：太阳高度和夜色深浅由上周平均分决定 -->
+  <img class="sky-bg" src="img/sky.jpg" alt="" onerror="this.remove()">
+  <div class="night" aria-hidden="true"></div>
+  <img class="sun" src="img/sun.png" alt="" onerror="this.remove()">
+  <img class="ridges" src="img/ridges.png" alt="" onerror="this.remove()">
   <img class="hero-mascot" src="img/hero.png" alt="" onerror="this.remove()">
 
   <div class="sky-inner">

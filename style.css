@@ -27,64 +27,27 @@ img { display: block; max-width: 100%; }
 button, input, select { font: inherit; color: inherit; }
 
 /* ---------- 天 ---------- */
+/* 画面全部来自 GPT 图层（img/sky.jpg、sun.png、ridges.png、hero.png）；图还没放进来时，只剩一层纯色渐变底 */
 .sky {
-  position: relative; overflow: hidden; isolation: isolate; color: #fff;
+  position: relative; overflow: hidden; isolation: isolate; color: #fff; z-index: 0;
   min-height: max(640px, min(100svh, 860px));
-  background: linear-gradient(to bottom, #13164a 0%, #2c2466 30%, #74407e 55%, #e2676b 74%, #ffab63 87%, #ffd9a0 100%);
+  background: linear-gradient(to bottom, #13164a 0%, #2c2466 40%, #74407e 70%, #c45a6e 100%);
 }
-.sky::before { /* 夜色：分数越高越淡 */
-  content: ""; position: absolute; inset: 0; z-index: -1;
-  background: linear-gradient(to bottom, #04061a 0%, #0b1030 55%, #1d1840 100%);
-  opacity: calc(.92 - var(--rise) * .92);
+.sky-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; z-index: -3; }
+.night { /* 夜色：上周平均分越高越淡 */
+  position: absolute; inset: 0; z-index: -2;
+  background: #05071c;
+  opacity: calc(.8 - var(--rise) * .8);
   transition: opacity 2.6s ease;
 }
-.sky { z-index: 0; }
-.stars {
-  position: absolute; inset: 0 0 35% 0; z-index: -1;
-  background-image:
-    radial-gradient(1.6px 1.6px at 8% 18%, #fff 50%, transparent 51%),
-    radial-gradient(1.2px 1.2px at 17% 42%, #fff 50%, transparent 51%),
-    radial-gradient(1.8px 1.8px at 26% 9%, #fff 50%, transparent 51%),
-    radial-gradient(1.1px 1.1px at 34% 31%, #fff 50%, transparent 51%),
-    radial-gradient(1.4px 1.4px at 45% 14%, #fff 50%, transparent 51%),
-    radial-gradient(1.1px 1.1px at 52% 47%, #fff 50%, transparent 51%),
-    radial-gradient(1.7px 1.7px at 61% 6%, #fff 50%, transparent 51%),
-    radial-gradient(1.2px 1.2px at 70% 28%, #fff 50%, transparent 51%),
-    radial-gradient(1.5px 1.5px at 79% 12%, #fff 50%, transparent 51%),
-    radial-gradient(1.1px 1.1px at 86% 38%, #fff 50%, transparent 51%),
-    radial-gradient(1.6px 1.6px at 93% 20%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 4% 55%, #fff 50%, transparent 51%),
-    radial-gradient(1.3px 1.3px at 39% 60%, #fff 50%, transparent 51%),
-    radial-gradient(1px 1px at 96% 58%, #fff 50%, transparent 51%);
-  opacity: calc(1 - var(--rise) * 1.3);
-  transition: opacity 2.6s ease;
-  animation: twinkle 5s ease-in-out infinite alternate;
-}
-@keyframes twinkle { to { filter: brightness(.55); } }
-
 .sun {
   position: absolute; z-index: -1; left: 72%;
-  width: clamp(120px, 24vmin, 210px); aspect-ratio: 1; border-radius: 50%;
-  bottom: calc(12% + var(--rise) * 46%);
+  width: clamp(200px, 42vmin, 380px); /* 图里带光晕，所以比太阳本身大 */
+  bottom: calc(14% + var(--rise) * 44%);
   transform: translate(-50%, 50%);
-  background: radial-gradient(circle at 50% 45%, #fffbe8 0 30%, #ffe08a 55%, #ffb547 80%, #ff8a4c 100%);
-  box-shadow: 0 0 60px 24px rgba(255, 196, 110, .55), 0 0 200px 110px rgba(255, 130, 80, .28);
   transition: bottom 2.6s cubic-bezier(.2, .7, .15, 1);
 }
-.sun::before { /* 光芒 */
-  content: ""; position: absolute; inset: -260%; border-radius: 50%;
-  background: repeating-conic-gradient(rgba(255, 226, 160, .16) 0 5deg, transparent 5deg 15deg);
-  -webkit-mask: radial-gradient(circle, #000 12%, transparent 62%); mask: radial-gradient(circle, #000 12%, transparent 62%);
-  opacity: calc(.25 + var(--rise) * .75);
-  animation: spin 120s linear infinite;
-  transition: opacity 2.6s ease;
-}
-@keyframes spin { to { transform: rotate(1turn); } }
-
-.ridges { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 32%; z-index: 0; }
-.ridges .r1 { fill: #4a2a5e; }
-.ridges .r2 { fill: #2b1a45; }
-.ridges .r3 { fill: var(--paper); }
+.ridges { position: absolute; left: 0; bottom: -1px; width: 100%; height: 34%; object-fit: cover; object-position: center bottom; z-index: 0; }
 /* 主图站在左边的山上，朝右看太阳 */
 .hero-mascot { position: absolute; z-index: 1; left: 3%; bottom: 8%; width: min(38vw, 300px); filter: drop-shadow(0 12px 24px rgba(20, 10, 40, .35)); }
 @media (min-width: 900px) { .hero-mascot { left: 44%; width: 260px; } }
@@ -162,7 +125,7 @@ button, input, select { font: inherit; color: inherit; }
 .trail .tg { background: linear-gradient(90deg, var(--gold), var(--sun-c)); }
 .tip {
   position: absolute; top: 50%; left: 0; width: 22px; height: 22px; border-radius: 50%; transform: translate(-50%, -50%);
-  background: radial-gradient(circle at 45% 40%, #fffbe8 0 25%, #ffd36b 60%, var(--sun-c)); box-shadow: 0 0 0 3px #fff, 0 0 18px 6px rgba(255, 160, 80, .55);
+  background: var(--sun-c); box-shadow: 0 0 0 4px #fff, 0 2px 10px rgba(255, 122, 61, .5);
   transition: left 1.4s cubic-bezier(.2, .7, .15, 1);
 }
 .lane-detail { padding: 0 16px 18px; display: grid; gap: 16px; }
