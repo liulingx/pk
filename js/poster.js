@@ -102,9 +102,9 @@ window.Poster = (function () {
     ctx.fillStyle = "#1b1530"; ctx.font = `800 40px ${SANS}`;
     ctx.fillText("说好的三件事", 72, 965);
     const e = row.entry;
-    if (typeof e.screen === "number" && typeof row.player.baseline === "number") {
+    if (typeof e.screen === "number" && typeof row.base === "number") {
       ctx.font = `500 28px ${SANS}`; ctx.fillStyle = "#5c5470"; ctx.textAlign = "right";
-      ctx.fillText(`手机娱乐 日均 ${row.player.baseline} → ${e.screen} 分钟`, W - 72, 965);
+      ctx.fillText(`手机娱乐 日均 ${row.base} → ${e.screen} 分钟`, W - 72, 965);
       ctx.textAlign = "left";
     }
     (e.goals || []).slice(0, 3).forEach((g, i) => {

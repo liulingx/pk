@@ -12,7 +12,8 @@
     get() { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) { return {}; } },
     set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) { /* 隐私模式下不存 */ } },
   };
-  const clean = s => String(s || "").replace(/[｜|\r\n]+/g, " ").trim();
+  // 去掉会打乱卡片格式的字符：分隔符、各种换行、卡头的方括号
+  const clean = s => String(s || "").replace(/[｜|\r\n\u2028\u2029\u0085\v\f]+/g, " ").replace(/【/g, "[").replace(/】/g, "]").trim();
   const num = v => Math.max(0, Math.floor(Number(v) || 0));
 
   const thisWeek = Math.max(1, Score.currentWeek(data.start));
@@ -64,7 +65,11 @@
     render();
   }
 
-  function minutes(h, m) { return num(form.elements[h].value) * 60 + Math.min(59, num(form.elements[m].value)); }
+  // 两格都空返回 null，生成“（未填）”，不会被当成 0 分钟拿满分
+  function minutes(h, m) {
+    if (form.elements[h].value === "" && form.elements[m].value === "") return null;
+    return num(form.elements[h].value) * 60 + num(form.elements[m].value);
+  }
   function hm(total) { return `${Math.floor(total / 60)}小时${total % 60}分钟`; }
 
   function render() {
@@ -76,14 +81,17 @@
     if (mode === "join") {
       const t = minutes("bh", "bm");
       L.push(`娱乐清单：${clean(form.elements.list.value) || "（未填）"}`);
-      L.push(`基线：合计 ${hm(t)}，日均 ${Math.round(t / 7)} 分钟`);
+      L.push(t === null ? "基线：（未填）" : `基线：合计 ${hm(t)}，日均 ${Math.round(t / 7)} 分钟`);
+      if (t === null) warn.push("填上加入前那一整周的清单合计时长");
       if (!clean(form.elements.list.value)) warn.push("先写下你的娱乐清单");
     } else {
       const t = minutes("wh", "wm");
-      L.push(`第${lastWeek}周娱乐：合计 ${hm(t)}，日均 ${Math.round(t / 7)} 分钟`);
+      L.push(t === null ? `第${lastWeek}周娱乐：（未填）` : `第${lastWeek}周娱乐：合计 ${hm(t)}，日均 ${Math.round(t / 7)} 分钟`);
+      if (t === null) warn.push("填上上周的清单合计时长");
       L.push(`第${lastWeek}周结果：`);
       last.forEach((g, i) => L.push(`${i + 1}. ${ST[g.status] || "❓未选"}｜${clean(g.text) || "（未填）"}｜证据：${clean(g.evidence) || "无"}`));
       if (last.some(g => !g.status)) warn.push("上周每件事都要选完成 / 一半 / 没成");
+      if (last.some(g => (g.status === "done" || g.status === "half") && !clean(g.evidence))) warn.push("完成和一半都要写证据，没证据算没成");
       if (lastWeek < 1) warn.push("开赛第一周交加入卡就行");
     }
     L.push(`第${thisWeek}周目标：`);
@@ -94,7 +102,7 @@
 
     form.querySelectorAll(".avg").forEach(s => {
       const t = s.dataset.for === "bh" ? minutes("bh", "bm") : minutes("wh", "wm");
-      s.textContent = t ? `≈ 日均 ${Math.round(t / 7)} 分钟` : "";
+      s.textContent = t === null ? "" : `≈ 日均 ${Math.round(t / 7)} 分钟`;
     });
     let w = form.querySelector(".warn");
     if (!w) { w = document.createElement("p"); w.className = "warn"; out.after(w); }

@@ -45,29 +45,41 @@
 
   function byId(players) { return Object.fromEntries(players.map(p => [p.id, p])); }
 
+  // 结算时把当时的基线存进 entry（base），以后改基线不会追溯改历史分
+  function baseOf(entry, player) { return typeof entry.base === "number" ? entry.base : player.baseline; }
+  function submitted(entry) {
+    return typeof entry.screen === "number" || (entry.goals || []).some(g => g && g.status);
+  }
+
   // 只排已结算的周；加入前的周不算
   function rankWeek(players, week) {
     if (!week || !week.settled) return [];
     const P = byId(players);
     return (week.entries || [])
       .filter(e => P[e.id] && week.n >= (P[e.id].fromWeek || 1))
-      .map(e => ({ id: e.id, name: P[e.id].name, player: P[e.id], entry: e, ...entryScore(P[e.id].baseline, e) }))
+      .map(e => ({ id: e.id, name: P[e.id].name, player: P[e.id], entry: e, base: baseOf(e, P[e.id]), ...entryScore(baseOf(e, P[e.id]), e) }))
       .sort((a, b) => b.total - a.total || b.goals - a.goals);
   }
 
-  // 赛季榜：已结算各周的平均分；赛季里已结算满 2 周后，至少交满 2 周才上榜
+  // 赛季榜：加入后每个已结算的周都算进平均，没交的周记 0；
+  // 赛季里已结算满 2 周后，至少真正交过 2 周才上榜
   function seasonRank(players, weeks, season, len) {
     const settled = weeks.filter(w => w.settled && seasonOf(w.n, len) === season);
     const need = Math.min(2, settled.length);
-    const acc = {};
-    for (const w of settled) {
-      for (const r of rankWeek(players, w)) {
-        (acc[r.id] = acc[r.id] || { id: r.id, name: r.name, player: r.player, totals: [] }).totals.push(r.total);
+    if (!need) return [];
+    return players.map(p => {
+      const mine = settled.filter(w => w.n >= (p.fromWeek || 1));
+      const totals = [];
+      let sent = 0;
+      for (const w of mine) {
+        const row = rankWeek(players, w).find(r => r.id === p.id);
+        totals.push(row ? row.total : 0);
+        if (row && submitted(row.entry)) sent++;
       }
-    }
-    return Object.values(acc)
-      .filter(x => x.totals.length >= need && need > 0)
-      .map(x => ({ ...x, weeks: x.totals.length, avg: Math.round(x.totals.reduce((a, b) => a + b, 0) / x.totals.length * 10) / 10 }))
+      const avg = totals.length ? Math.round(totals.reduce((a, b) => a + b, 0) / totals.length * 10) / 10 : 0;
+      return { id: p.id, name: p.name, player: p, weeks: sent, avg };
+    })
+      .filter(x => x.weeks >= need)
       .sort((a, b) => b.avg - a.avg || b.weeks - a.weeks);
   }
 
@@ -76,7 +88,7 @@
     const rows = rankWeek(players, week);
     let saved = 0, done = 0, half = 0;
     for (const r of rows) {
-      const b = r.player.baseline, s = r.entry.screen;
+      const b = r.base, s = r.entry.screen;
       if (typeof b === "number" && typeof s === "number") saved += Math.max(0, b - s) * 7;
       for (const g of (r.entry.goals || []).slice(0, GOALS_PER_WEEK)) {
         if (g && g.status === "done") done++;
@@ -94,7 +106,7 @@
 
   const api = { SCREEN_MAX, SCREEN_FLOOR_MIN, GOAL_POINTS, GOALS_PER_WEEK,
     screenScore, goalsScore, entryScore, weekRange, currentWeek, seasonOf,
-    rankWeek, seasonRank, weekStats, dropRate };
+    rankWeek, seasonRank, weekStats, dropRate, submitted };
   if (typeof module !== "undefined") module.exports = api;
   else root.Score = api;
 })(this);

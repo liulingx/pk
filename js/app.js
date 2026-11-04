@@ -112,12 +112,12 @@ window.PK = (function () {
         $("season").innerHTML = rows.map((x, i) => `<li><span class="rk">${i + 1}</span>${avatarHTML(x.player)}<span class="nm">${esc(x.name)}<small>交了 ${x.weeks} 周</small></span><span class="avg">${x.avg}<small>平均</small></span></li>`).join("");
         let best = null;
         for (const r of latestRows) {
-          const d = Score.dropRate(r.player.baseline, r.entry.screen);
+          const d = Score.dropRate(r.base, r.entry.screen);
           if (d !== null && d > 0 && (!best || d > best.d)) best = { r, d };
         }
         if (best) {
           $("improver").hidden = false;
-          $("improver").innerHTML = `第 ${latest.n} 周最大进步：<b>${esc(best.r.name)}</b>，手机娱乐日均从 ${best.r.player.baseline} 分钟降到 ${best.r.entry.screen} 分钟，少了 <b>${Math.round(best.d * 100)}%</b>。`;
+          $("improver").innerHTML = `第 ${latest.n} 周最大进步：<b>${esc(best.r.name)}</b>，手机娱乐日均从 ${best.r.base} 分钟降到 ${best.r.entry.screen} 分钟，少了 <b>${Math.round(best.d * 100)}%</b>。`;
         }
       }
     }
@@ -161,7 +161,7 @@ window.PK = (function () {
         const st = STAMP[g.status] ? g.status : "miss";
         return `<li><span class="stamp ${st}">${STAMP[st]}</span><span>${esc(g.text)}<small>证据：${esc(g.evidence || "没交")}</small></span></li>`;
       }).join("");
-      const screenLine = typeof e.screen === "number" ? `日均 ${e.screen} 分钟 · 基线 ${p.baseline ?? "—"}` : "这周没交截图";
+      const screenLine = typeof e.screen === "number" ? `日均 ${e.screen} 分钟 · 基线 ${row.base ?? "—"}` : "这周没交截图";
       return `<details class="lane${i === 0 ? " first" : ""}" data-total="${row.total}">
         <summary>
           <span class="rk">${i + 1}</span>${avatarHTML(p)}
@@ -177,26 +177,26 @@ window.PK = (function () {
           </div>
           <div>
             <h4>手机娱乐日均（分钟）</h4>
-            ${sparkHTML(p, n)}
+            ${sparkHTML(p, n, row.base)}
             <button type="button" class="btn btn-sun small" data-poster="${esc(row.id)}">生成战报图</button>
           </div>
         </div>
       </details>`;
     }
 
-    function sparkHTML(p, upto) {
+    function sparkHTML(p, upto, base) {
       const pts = settled.filter(w => w.n <= upto).sort((a, b) => a.n - b.n)
         .map(w => ({ n: w.n, v: ((w.entries || []).find(e => e.id === p.id) || {}).screen }))
         .filter(x => typeof x.v === "number");
-      if (!pts.length || typeof p.baseline !== "number") return "";
+      if (!pts.length || typeof base !== "number") return "";
       const W = 300, H = 90, L = 8, R = 8, T = 16, B = 18;
-      const max = Math.max(p.baseline, ...pts.map(x => x.v)) * 1.1 || 1;
+      const max = Math.max(base, ...pts.map(x => x.v)) * 1.1 || 1;
       const y = v => T + (1 - v / max) * (H - T - B);
       const x = i => pts.length === 1 ? W / 2 : L + i * (W - L - R) / (pts.length - 1);
       const line = pts.map((q, i) => `${x(i).toFixed(1)},${y(q.v).toFixed(1)}`).join(" ");
-      return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="基线 ${p.baseline} 分钟，最近 ${pts[pts.length - 1].v} 分钟">
-        <line class="base" x1="0" x2="${W}" y1="${y(p.baseline)}" y2="${y(p.baseline)}"/>
-        <text x="0" y="${y(p.baseline) - 4}">基线 ${p.baseline}</text>
+      return `<svg class="spark" viewBox="0 0 ${W} ${H}" role="img" aria-label="基线 ${base} 分钟，最近 ${pts[pts.length - 1].v} 分钟">
+        <line class="base" x1="0" x2="${W}" y1="${y(base)}" y2="${y(base)}"/>
+        <text x="0" y="${y(base) - 4}">基线 ${base}</text>
         ${pts.length > 1 ? `<polyline class="ln" points="${line}"/>` : ""}
         ${pts.map((q, i) => `<circle class="pt" cx="${x(i)}" cy="${y(q.v)}" r="4"/>` +
           (i === 0 || i === pts.length - 1 ? `<text x="${x(i)}" y="${H - 3}" text-anchor="${pts.length === 1 ? "middle" : i === 0 ? "start" : "end"}">第${q.n}周 ${q.v}</text>` : "")).join("")}
