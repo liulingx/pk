@@ -42,7 +42,7 @@ button, input, select { font: inherit; color: inherit; }
 }
 .sun {
   position: absolute; z-index: -1; left: 72%;
-  width: clamp(200px, 42vmin, 380px); /* 图里带光晕，所以比太阳本身大 */
+  width: clamp(300px, 70vmin, 480px); /* 图里带光晕，太阳本体约占 35% */
   bottom: calc(14% + var(--rise) * 44%);
   transform: translate(-50%, 50%);
   transition: bottom 2.6s cubic-bezier(.2, .7, .15, 1);
