@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>互卷周赛</title>
+<meta name="description" content="几个人每周比两件事：手机娱乐时长降了多少，三个有证据的目标做成了几个。">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+  <header class="hero">
+    <p class="eyebrow" id="status">载入中</p>
+    <h1 id="title">互卷周赛</h1>
+    <p class="tagline" id="tagline"></p>
+    <div class="split" aria-hidden="true">
+      <div class="split-part screen"><b>40</b><span>少刷</span></div>
+      <div class="split-part goals"><b>60</b><span>做成</span></div>
+    </div>
+  </header>
+
+  <section id="board-section">
+    <h2 id="board-title">本周榜</h2>
+    <div id="board"></div>
+  </section>
+
+  <section>
+    <h2>怎么算分</h2>
+    <div class="cards">
+      <article class="card screen">
+        <h3><span class="pts">40 分</span>手机娱乐时长</h3>
+        <ul>
+          <li>只算<strong>社交、娱乐、游戏</strong>三类，看系统周报里的日均。学习也要用手机，所以不比总时长。</li>
+          <li>和<strong>你自己的基线周</strong>比：每少 1% 得 1 分，少 40% 拿满。</li>
+          <li>日均已经在 30 分钟以内，直接满分。</li>
+          <li>基线一旦定下就不变，保持住也一直拿分。</li>
+        </ul>
+      </article>
+      <article class="card goals">
+        <h3><span class="pts">60 分</span>三个有证据的目标</h3>
+        <ul>
+          <li>每周一中午 12 点前写下 3 个目标，每个都要写清<strong>拿什么证明</strong>：成绩截图、跑步轨迹、交出去的文件、别人的确认。</li>
+          <li>完成 20 分，完成一半以上 10 分，没完成或没证据 0 分。</li>
+          <li>“学了 3 小时”不算目标，“闭卷做完第二章习题、正确率截图”算。</li>
+        </ul>
+      </article>
+    </div>
+  </section>
+
+  <section>
+    <h2>每周要交什么</h2>
+    <ol class="steps">
+      <li><b>周一 12:00 前</b>：3 个目标，各带一句证据形式。</li>
+      <li><b>周日 22:00 前</b>：手机“屏幕使用时间”周报截图（安卓用“数字健康”），加上每个目标的证据。</li>
+      <li><b>周日晚上</b>：结算，这个页面更新本周榜。</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2>防注水</h2>
+    <ul class="plain">
+      <li>截图要能看到日期。看不到日期的截图不算。</li>
+      <li>证据在参赛的人之间互相公开，有人质疑时拿不出原图，那一项记 0 分。</li>
+      <li>这个页面只放昵称、目标和分数，不放截图、学校、联系方式。</li>
+      <li>不设连续打卡。哪周断了，下周接着比就行。</li>
+    </ul>
+  </section>
+
+  <section class="join">
+    <h2>想加入</h2>
+    <p id="join"></p>
+  </section>
+
+  <section id="history-section" hidden>
+    <h2>往期</h2>
+    <ol id="history" class="history"></ol>
+  </section>
+
+  <footer>每周日更新 · 分数由页面按上面的规则直接算出</footer>
+</main>
+<script src="js/score.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
