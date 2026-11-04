@@ -1,11 +1,13 @@
-// 计分规则，网页和 tools/test-score.js 共用一份。
-// 屏幕 40 分：比自己基线周的日均娱乐时长，每降 1% 得 1 分，降 40% 封顶；日均 30 分钟以内直接满分。
+// 计分规则，网页、tools/test-score.js 和 tools/settle.py 的口径以这里为准（settle.py 只录数据、不算分）。
+// 屏幕 40 分：比自己基线的日均娱乐时长，每降 1% 得 1 分，降 40% 封顶；日均 30 分钟以内直接满分。
 // 目标 60 分：每周 3 个有证据的目标，完成 20、完成一半以上 10、没完成或没交证据 0。
+// 第 1 周从 start 那天（周一）开始；4 周一个赛季。
 (function (root) {
   const SCREEN_MAX = 40;
   const SCREEN_FLOOR_MIN = 30;
   const GOAL_POINTS = { done: 20, half: 10, miss: 0 };
   const GOALS_PER_WEEK = 3;
+  const DAY = 86400000;
 
   function screenScore(baseline, week) {
     if (typeof week !== "number" || week < 0) return 0;
@@ -27,35 +29,72 @@
     return { screen, goals, total: screen + goals };
   }
 
-  // 第 n 周的起止日期；第 0 周是基线周
+  // 第 n 周（n ≥ 1）的起止日期，按北京时间零点
   function weekRange(start, n) {
-    const from = new Date(start + "T00:00:00+08:00");
-    from.setUTCDate(from.getUTCDate() + 7 * n);
-    const to = new Date(from);
-    to.setUTCDate(to.getUTCDate() + 6);
-    return { from, to };
+    const from = new Date(new Date(start + "T00:00:00+08:00").getTime() + 7 * (n - 1) * DAY);
+    return { from, to: new Date(from.getTime() + 6 * DAY) };
   }
 
-  // 现在是第几周（北京时间）；开赛前返回 -1
+  // 现在是第几周；开赛前返回 0
   function currentWeek(start, now) {
-    const t0 = new Date(start + "T00:00:00+08:00").getTime();
-    const diff = (now || new Date()).getTime() - t0;
-    return diff < 0 ? -1 : Math.floor(diff / (7 * 86400000));
+    const diff = (now || new Date()).getTime() - new Date(start + "T00:00:00+08:00").getTime();
+    return diff < 0 ? 0 : Math.floor(diff / (7 * DAY)) + 1;
   }
 
-  // 加入那一周是自己的基线周，不进榜
+  function seasonOf(n, len) { return Math.ceil(n / (len || 4)); }
+
+  function byId(players) { return Object.fromEntries(players.map(p => [p.id, p])); }
+
+  // 只排已结算的周；加入前的周不算
   function rankWeek(players, week) {
-    const base = Object.fromEntries(players.map(p => [p.id, p.baseline]));
-    const name = Object.fromEntries(players.map(p => [p.id, p.name]));
-    const joined = Object.fromEntries(players.map(p => [p.id, p.joinedWeek || 0]));
+    if (!week || !week.settled) return [];
+    const P = byId(players);
     return (week.entries || [])
-      .filter(e => e.id in base && week.n > joined[e.id])
-      .map(e => ({ id: e.id, name: name[e.id], entry: e, ...entryScore(base[e.id], e) }))
+      .filter(e => P[e.id] && week.n >= (P[e.id].fromWeek || 1))
+      .map(e => ({ id: e.id, name: P[e.id].name, player: P[e.id], entry: e, ...entryScore(P[e.id].baseline, e) }))
       .sort((a, b) => b.total - a.total || b.goals - a.goals);
   }
 
+  // 赛季榜：已结算各周的平均分；赛季里已结算满 2 周后，至少交满 2 周才上榜
+  function seasonRank(players, weeks, season, len) {
+    const settled = weeks.filter(w => w.settled && seasonOf(w.n, len) === season);
+    const need = Math.min(2, settled.length);
+    const acc = {};
+    for (const w of settled) {
+      for (const r of rankWeek(players, w)) {
+        (acc[r.id] = acc[r.id] || { id: r.id, name: r.name, player: r.player, totals: [] }).totals.push(r.total);
+      }
+    }
+    return Object.values(acc)
+      .filter(x => x.totals.length >= need && need > 0)
+      .map(x => ({ ...x, weeks: x.totals.length, avg: Math.round(x.totals.reduce((a, b) => a + b, 0) / x.totals.length * 10) / 10 }))
+      .sort((a, b) => b.avg - a.avg || b.weeks - a.weeks);
+  }
+
+  // 一周的合计：大家一共少刷了多少分钟、做成了几件事
+  function weekStats(players, week) {
+    const rows = rankWeek(players, week);
+    let saved = 0, done = 0, half = 0;
+    for (const r of rows) {
+      const b = r.player.baseline, s = r.entry.screen;
+      if (typeof b === "number" && typeof s === "number") saved += Math.max(0, b - s) * 7;
+      for (const g of (r.entry.goals || []).slice(0, GOALS_PER_WEEK)) {
+        if (g && g.status === "done") done++;
+        else if (g && g.status === "half") half++;
+      }
+    }
+    return { people: rows.length, savedMinutes: saved, done, half };
+  }
+
+  // 降幅（0–1），没有数据返回 null
+  function dropRate(baseline, screen) {
+    if (typeof baseline !== "number" || baseline <= 0 || typeof screen !== "number") return null;
+    return (baseline - screen) / baseline;
+  }
+
   const api = { SCREEN_MAX, SCREEN_FLOOR_MIN, GOAL_POINTS, GOALS_PER_WEEK,
-    screenScore, goalsScore, entryScore, weekRange, currentWeek, rankWeek };
+    screenScore, goalsScore, entryScore, weekRange, currentWeek, seasonOf,
+    rankWeek, seasonRank, weekStats, dropRate };
   if (typeof module !== "undefined") module.exports = api;
   else root.Score = api;
 })(this);
