@@ -104,9 +104,12 @@
     return (baseline - screen) / baseline;
   }
 
+  // 首屏和战报图用哪张场景图：0–100 分对应夜、破晓、日出、晨光
+  function sceneLevel(score) { return score < 25 ? 1 : score < 50 ? 2 : score < 75 ? 3 : 4; }
+
   const api = { SCREEN_MAX, SCREEN_FLOOR_MIN, GOAL_POINTS, GOALS_PER_WEEK,
     screenScore, goalsScore, entryScore, weekRange, currentWeek, seasonOf,
-    rankWeek, seasonRank, weekStats, dropRate, submitted };
+    rankWeek, seasonRank, weekStats, dropRate, submitted, sceneLevel };
   if (typeof module !== "undefined") module.exports = api;
   else root.Score = api;
 })(this);

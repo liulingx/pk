@@ -1,7 +1,9 @@
-// 战报图：1080×1350（4:5，朋友圈、小红书都能直接发）。上半是天，太阳高度 = 本周总分；下半是三件事。
+// 战报图：1080×1350（4:5，朋友圈、小红书都能直接发）。上半是天，天亮到哪一步看本周总分；下半是三件事。
 window.Poster = (function () {
-  const W = 1080, H = 1350, HORIZON = 820, SKY_H = 900;
-  const PAPER = "#fff8f0"; // 要和 ridges.png 底部的米色、style.css 的 --paper 一致
+  const W = 1080, H = 1350, SKY_H = 900;
+  // 场景图按宽铺满、底边放在这里：米白坡从约 830 才开始，上面的白字（分数、进度条）都压在深色的天和山上
+  const SCENE_BOTTOM = 1188;
+  const PAPER = "#fff8f0"; // 要和场景图底部的米色、style.css 的 --paper 一致
   const NUM = '"DIN Condensed", "DIN Alternate", "Bahnschrift", "Roboto Condensed", "Arial Narrow", sans-serif';
   const SANS = '-apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif';
   const STAMP = { done: ["完成", "#ff7a3d"], half: ["一半", "#ff7a3d"], miss: ["没成", "#8a8299"] };
@@ -19,38 +21,27 @@ window.Poster = (function () {
     return s + "…";
   }
 
-  // 等比铺满一个矩形，底边对齐（山和天空的地平线都在图的下方）
-  function cover(ctx, img, x, y, w, h) {
-    const sc = Math.max(w / img.width, h / img.height);
-    const dw = img.width * sc, dh = img.height * sc;
-    ctx.save();
-    ctx.beginPath(); ctx.rect(x, y, w, h); ctx.clip();
-    ctx.drawImage(img, x + (w - dw) / 2, y + h - dh, dw, dh);
-    ctx.restore();
-  }
-
   async function make({ data, week, row, rank, of, color }) {
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const c = document.createElement("canvas");
     c.width = W; c.height = H;
     const ctx = c.getContext("2d");
-    const k = row.total / 100;
 
-    // 画面用和首屏同一套 GPT 图层；没有图时只剩纯色渐变底
-    const [skyImg, sunImg, ridgeImg] = await Promise.all(["img/sky.jpg", "img/sun.png", "img/ridges.png"].map(loadImg));
-    if (skyImg) cover(ctx, skyImg, 0, 0, W, SKY_H);
-    else {
+    // 画面用和首屏同一套场景图（竖版），按本周总分选；没有图时只剩纯色渐变底
+    const skyImg = await loadImg(`img/scene-${Score.sceneLevel(row.total)}-tall.jpg`);
+    if (skyImg) {
+      const sh = skyImg.height * W / skyImg.width;
+      ctx.drawImage(skyImg, 0, SCENE_BOTTOM - sh, W, sh);
+      const g = ctx.createLinearGradient(0, SCENE_BOTTOM - 40, 0, SCENE_BOTTOM);   // 图底的米白和 PAPER 差一点点，渐变接上
+      g.addColorStop(0, "rgba(255,248,240,0)"); g.addColorStop(1, PAPER);
+      ctx.fillStyle = g; ctx.fillRect(0, SCENE_BOTTOM - 40, W, 40);
+    } else {
       const g = ctx.createLinearGradient(0, 0, 0, SKY_H);
       g.addColorStop(0, "#13164a"); g.addColorStop(.4, "#2c2466"); g.addColorStop(.7, "#74407e"); g.addColorStop(1, "#c45a6e");
       ctx.fillStyle = g; ctx.fillRect(0, 0, W, SKY_H);
     }
-    // 夜色：分数越高越淡
-    ctx.fillStyle = `rgba(5, 7, 28, ${(.8 - k * .8).toFixed(3)})`;
-    ctx.fillRect(0, 0, W, SKY_H);
-    // 太阳：高度 = 本周总分
-    if (sunImg) { const sz = 460; ctx.drawImage(sunImg, 800 - sz / 2, HORIZON - 40 - k * 430 - sz / 2, sz, sz); }
-    if (ridgeImg) cover(ctx, ridgeImg, 0, SKY_H - 400, W, 400);
-    ctx.fillStyle = PAPER; ctx.fillRect(0, SKY_H, W, H - SKY_H);
+    const paperTop = skyImg ? SCENE_BOTTOM : SKY_H;
+    ctx.fillStyle = PAPER; ctx.fillRect(0, paperTop, W, H - paperTop);
 
     // 抬头
     ctx.fillStyle = "rgba(255,255,255,.85)";
@@ -62,7 +53,7 @@ window.Poster = (function () {
     ctx.save();
     ctx.beginPath(); ctx.arc(ax + ar, ay + ar, ar, 0, Math.PI * 2); ctx.closePath();
     ctx.fillStyle = color; ctx.fill(); ctx.clip();
-    const im = row.player.avatar ? await loadImg(`img/a${Number(row.player.avatar)}.png`) : null;
+    const im = row.player.avatar ? await loadImg(`img/a${Number(row.player.avatar)}.jpg`) : null;
     if (im) { ctx.fillStyle = "#fff"; ctx.fillRect(ax, ay, ar * 2, ar * 2); ctx.drawImage(im, ax, ay, ar * 2, ar * 2); }
     else { ctx.fillStyle = "#fff"; ctx.font = `900 50px ${SANS}`; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText([...row.name][0] || "?", ax + ar, ay + ar + 2); }
     ctx.restore();

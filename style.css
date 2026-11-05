@@ -15,7 +15,6 @@
   --num: "DIN Condensed", "DIN Alternate", "Bahnschrift", "Roboto Condensed", "Arial Narrow", system-ui, sans-serif;
   --sans: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
   --mono: ui-monospace, "SF Mono", Menlo, Consolas, "PingFang SC", monospace;
-  --rise: 0;
   color-scheme: light;
 }
 
@@ -27,29 +26,20 @@ img { display: block; max-width: 100%; }
 button, input, select { font: inherit; color: inherit; }
 
 /* ---------- 天 ---------- */
-/* 画面全部来自 GPT 图层（img/sky.jpg、sun.png、ridges.png、hero.png）；图还没放进来时，只剩一层纯色渐变底 */
+/* 画面全部来自 GPT 出的图（场景 img/scene-档-tall/wide.jpg、主图 hero.png）；图还没放进来时，只剩一层纯色渐变底 */
 .sky {
   position: relative; overflow: hidden; isolation: isolate; color: #fff; z-index: 0;
   min-height: max(640px, min(100svh, 860px));
   background: linear-gradient(to bottom, #13164a 0%, #2c2466 40%, #74407e 70%, #c45a6e 100%);
 }
-.sky-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center bottom; z-index: -3; }
-.night { /* 夜色：上周平均分越高越淡 */
-  position: absolute; inset: 0; z-index: -2;
-  background: #05071c;
-  opacity: calc(.8 - var(--rise) * .8);
-  transition: opacity 2.6s ease;
+.scene, .scene img { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; }
+.scene img { object-fit: cover; object-position: center bottom; }
+.sky::after { /* 场景图底部的米白带颗粒，和下面内容区的 --paper 差一点点，渐变接上，不留缝 */
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 56px; z-index: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(255, 248, 240, 0), var(--paper));
 }
-.sun {
-  position: absolute; z-index: -1; left: 72%;
-  width: clamp(300px, 70vmin, 480px); /* 图里带光晕，太阳本体约占 35% */
-  bottom: calc(14% + var(--rise) * 44%);
-  transform: translate(-50%, 50%);
-  transition: bottom 2.6s cubic-bezier(.2, .7, .15, 1);
-}
-.ridges { position: absolute; left: 0; bottom: -1px; width: 100%; height: 34%; object-fit: cover; object-position: center bottom; z-index: 0; }
 /* 主图站在左边的山上，朝右看太阳 */
-.hero-mascot { position: absolute; z-index: 1; left: 3%; bottom: 8%; width: min(38vw, 300px); filter: drop-shadow(0 12px 24px rgba(20, 10, 40, .35)); }
+.hero-mascot { position: absolute; z-index: 1; left: 3%; bottom: 8%; width: min(38vw, 300px); filter: drop-shadow(0 6px 8px rgba(60, 30, 70, .18)); }
 @media (min-width: 900px) { .hero-mascot { left: 44%; width: 260px; } }
 
 .sky-inner { position: relative; z-index: 2; max-width: 960px; margin: 0 auto; padding: calc(48px + env(safe-area-inset-top)) 20px 36%; }

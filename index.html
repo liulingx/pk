@@ -10,11 +10,11 @@
 </head>
 <body>
 <header class="sky" id="sky">
-  <!-- 画面都是 GPT 出的图层：天空、太阳、山、主图。代码只摆位置：太阳高度和夜色深浅由上周平均分决定 -->
-  <img class="sky-bg" src="img/sky.jpg" alt="" onerror="this.remove()">
-  <div class="night" aria-hidden="true"></div>
-  <img class="sun" src="img/sun.png" alt="" onerror="this.remove()">
-  <img class="ridges" src="img/ridges.png" alt="" onerror="this.remove()">
+  <!-- 画面都是 GPT 出的图：同一片山的 4 个时刻（夜、破晓、日出、晨光），按上周平均分选一张；手机用竖版，电脑用横版 -->
+  <picture class="scene" id="scene">
+    <source media="(min-aspect-ratio: 1/1)" srcset="img/scene-2-wide.jpg">
+    <img src="img/scene-2-tall.jpg" alt="" onerror="this.closest('picture').remove()">
+  </picture>
   <img class="hero-mascot" src="img/hero.png" alt="" onerror="this.remove()">
 
   <div class="sky-inner">

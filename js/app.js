@@ -12,9 +12,9 @@ window.PK = (function () {
     if (p.avatar) return COLORS[(Number(p.avatar) - 1) % COLORS.length];
     let h = 0; for (const c of String(p.id || p.name)) h = (h * 31 + c.charCodeAt(0)) % 997; return COLORS[h % COLORS.length];
   }
-  // 有 img/aN.png 就用图，没有就显示昵称首字
+  // 有 img/aN.jpg 就用图，没有就显示昵称首字
   function avatarHTML(p) {
-    const img = p.avatar ? `<img src="img/a${Number(p.avatar)}.png" alt="" loading="lazy" onerror="this.remove()">` : "";
+    const img = p.avatar ? `<img src="img/a${Number(p.avatar)}.jpg" alt="" loading="lazy" onerror="this.remove()">` : "";
     return `<span class="av" style="--c:${colorOf(p)}"><span>${esc([...(p.name || "?")][0])}</span>${img}</span>`;
   }
 
@@ -60,10 +60,13 @@ window.PK = (function () {
     const latest = settled[0];
     const latestRows = latest ? Score.rankWeek(players, latest) : [];
 
-    // 天亮程度：上一周全员平均分；还没开赛就停在快天亮
-    const rise = latestRows.length ? latestRows.reduce((s, r) => s + r.total, 0) / latestRows.length / 100 : 0.14;
-    requestAnimationFrame(() => requestAnimationFrame(() =>
-      document.documentElement.style.setProperty("--rise", Math.max(0.08, Math.min(1, rise)).toFixed(3))));
+    // 天亮到哪一步：上一周全员平均分；还没开赛就停在破晓
+    const lv = latestRows.length ? Score.sceneLevel(latestRows.reduce((s, r) => s + r.total, 0) / latestRows.length) : 2;
+    const scene = $("scene");
+    if (scene && lv !== 2) {
+      scene.querySelector("source").srcset = `img/scene-${lv}-wide.jpg`;
+      scene.querySelector("img").src = `img/scene-${lv}-tall.jpg`;
+    }
 
     // 首屏数字：开赛以来的累计
     const stats = $("stats");
