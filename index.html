@@ -2,187 +2,23 @@
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>互卷周赛</title>
-<meta name="description" content="每周一交一张卡，比两件事：手机娱乐少刷了多少，说好的三件事做成了几件。">
-<meta name="theme-color" content="#0b1030">
-<link rel="stylesheet" href="style.css?v=1105d">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>互卷周赛 · 已搬家</title>
+<meta http-equiv="refresh" content="1; url=http://49.234.30.12/">
+<style>
+  :root { --bg: #fff8f0; --ink: #1b1530; --ink-2: #5c5470; --sun: #ff7a3d; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: var(--bg); color: var(--ink); font: 17px/1.7 -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; text-align: center; padding: 0 16px; }
+  h1 { font-size: 28px; margin: 0 0 8px; }
+  p { margin: 6px 0; color: var(--ink-2); }
+  a { display: inline-block; margin-top: 14px; padding: 12px 26px; border-radius: 99px; background: var(--sun); color: #fff; font-weight: 700; text-decoration: none; }
+</style>
 </head>
 <body>
-<header class="sky" id="sky">
-  <!-- 画面都是 GPT 出的图：同一片山的 4 个时刻（夜、破晓、日出、晨光），按上周平均分选一张；手机用竖版，电脑用横版 -->
-  <picture class="scene" id="scene">
-    <source media="(min-aspect-ratio: 1/1)" srcset="img/scene-2-wide.jpg">
-    <img src="img/scene-2-tall.jpg" alt="" onerror="this.closest('picture').remove()">
-  </picture>
-  <img class="hero-mascot" src="img/hero.png" alt="" onerror="this.remove()">
-
-  <div class="sky-inner">
-    <p class="chip" id="status">载入中</p>
-    <h1 id="title">互卷周赛</h1>
-    <p class="tagline" id="tagline"></p>
-    <dl class="stats" id="stats"></dl>
-    <nav class="cta">
-      <a href="#card-section" class="btn btn-sun">交卡</a>
-      <a href="#rules" class="btn btn-ghost">怎么玩</a>
-    </nav>
-  </div>
-</header>
-
-<main class="day">
-  <section id="me-section">
-    <div class="sec-head">
-      <h2>我的</h2>
-    </div>
-    <div id="me" class="me"></div>
-  </section>
-
-  <section id="board-section">
-    <div class="sec-head">
-      <h2 id="board-title">本周榜</h2>
-      <p class="sec-sub" id="board-sub"></p>
-    </div>
-    <div class="legend" aria-hidden="true"><span class="k k-s"></span>少刷 40<span class="k k-g"></span>做成 60</div>
-    <div id="board" class="track"></div>
-  </section>
-
-  <section id="season-section" hidden>
-    <div class="sec-head">
-      <h2 id="season-title">赛季榜</h2>
-      <p class="sec-sub">已结算各周的平均分 · 4 周一个赛季</p>
-    </div>
-    <ol id="season" class="podium"></ol>
-    <p id="improver" class="improver" hidden></p>
-  </section>
-
-  <section id="pledge-section" hidden>
-    <div class="sec-head">
-      <h2 id="pledge-title">这周大家在做的事</h2>
-      <p class="sec-sub">周一立下，下周一交证据</p>
-    </div>
-    <div id="pledges" class="pledges"></div>
-  </section>
-
-
-
-
-  <section id="card-section">
-    <div class="sec-head">
-      <h2>交卡</h2>
-      <p class="sec-sub">填完复制到群里。草稿只存在你自己的浏览器里</p>
-    </div>
-    <form id="card" class="card-form" autocomplete="off">
-      <div class="seg" role="tablist">
-        <button type="button" data-mode="join" class="on">第一次 · 加入卡</button>
-        <button type="button" data-mode="week">每周一 · 周一卡</button>
-      </div>
-      <div class="row2">
-        <label>昵称<input name="name" maxlength="12" placeholder="上榜用的名字"></label>
-        <label>头像编号<select name="avatar"></select></label>
-      </div>
-      <fieldset class="only-join">
-        <legend>基线：加入前那一整周</legend>
-        <label>娱乐清单<input name="list" maxlength="60" placeholder="例：抖音、B站、王者荣耀、短剧"></label>
-        <div class="hm"><span class="hm-l">清单合计</span><input name="bh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="基线周合计小时"><span>小时</span><input name="bm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="基线周合计分钟"><span>分钟</span></div>
-      </fieldset>
-      <fieldset class="only-week">
-        <legend id="last-legend">上周</legend>
-        <div class="hm"><span class="hm-l">清单合计</span><input name="wh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="上周合计小时"><span>小时</span><input name="wm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="上周合计分钟"><span>分钟</span></div>
-        <div id="last-goals"></div>
-      </fieldset>
-      <fieldset>
-        <legend id="next-legend">这周的 3 件事</legend>
-        <div id="next-goals"></div>
-      </fieldset>
-      <pre id="card-out" class="card-out" aria-live="polite"></pre>
-      <button type="button" id="copy" class="btn btn-sun wide">复制这张卡</button>
-      <div id="card-next" class="card-next" hidden></div>
-    </form>
-  </section>
-
-  <section id="rules">
-    <div class="sec-head">
-      <h2>怎么算分</h2>
-      <p class="sec-sub">满分 100，只跟自己的过去比</p>
-    </div>
-    <div class="rule-grid">
-      <article class="rule rule-s">
-        <p class="rule-pts"><b>40</b> 分 · 少刷</p>
-        <svg class="ramp" viewBox="0 0 300 150" role="img" aria-label="比基线每少刷 1% 得 1 分，少 40% 拿满 40 分">
-          <line x1="30" y1="120" x2="290" y2="120" class="axis"/>
-          <line x1="30" y1="120" x2="30" y2="14" class="axis"/>
-          <line x1="30" y1="24" x2="290" y2="24" class="guide"/>
-          <polyline points="30,120 150,24 290,24" class="ramp-line"/>
-          <circle cx="150" cy="24" r="6" class="ramp-dot"/>
-          <text x="150" y="140" text-anchor="middle">少刷 40%</text>
-          <text x="30" y="140" text-anchor="middle">0</text>
-          <text x="22" y="28" text-anchor="end">40</text>
-          <text x="220" y="16" text-anchor="middle">之后一直满分</text>
-        </svg>
-        <ul>
-          <li>只算你自己的<b>娱乐清单</b>：短视频、游戏、短剧……加入时定，一个赛季不改。</li>
-          <li>跟<b>加入前那一整周</b>比。那周已经过去了，谁也改不了。</li>
-          <li>基线截图里排前 5 的娱乐 App 都要进清单。</li>
-          <li>日均 30 分钟以内，直接满分。</li>
-        </ul>
-      </article>
-      <article class="rule rule-g">
-        <p class="rule-pts"><b>60</b> 分 · 做成</p>
-        <div class="tokens" aria-label="三个目标，完成 20 分，一半 10 分，没成 0 分">
-          <span class="tok done"><b>20</b>完成</span>
-          <span class="tok half"><b>10</b>一半</span>
-          <span class="tok miss"><b>0</b>没成</span>
-        </div>
-        <ul>
-          <li>每周 <b>3 个目标</b>，每个都写清拿什么证明：成绩截图、跑步轨迹、交出去的文件。</li>
-          <li>“学 3 小时”不算目标，“闭卷做完第三章、正确率截图”算。</li>
-          <li>选了完成却没写证据，按没成算；周一没立的事，事后补写不算。</li>
-          <li>对手觉得太水，周一 18 点前可以让你改一次。</li>
-        </ul>
-      </article>
-    </div>
-  </section>
-
-  <section id="rhythm">
-    <div class="sec-head">
-      <h2>一周只要记得一件事</h2>
-      <p class="sec-sub">周一中午交一张卡</p>
-    </div>
-    <ol class="timeline">
-      <li><b>周一 12:00 前</b><span>在群里发卡：上周少刷了多少、三件事做成几件、这周的三件事。截图另发。</span></li>
-      <li><b>周一 12:00–18:00</b><span>互相看证据。觉得谁的目标太水、证据不对，这时候说。</span></li>
-      <li><b>周一晚上</b><span>出榜，生成你的战报图。四周一个赛季，没交的周记 0 分，下赛季重新来过，不设连续打卡。</span></li>
-    </ol>
-  </section>
-
-  <section id="join-section" class="join">
-    <h2>想加入</h2>
-    <p id="join"></p>
-  </section>
-
-  <footer>
-    <p>分数由页面按规则直接算出 · 每周一晚上更新</p>
-    <p>只放昵称、目标和分数，截图不上网站</p>
-  </footer>
+<main>
+  <h1>互卷周赛搬家了</h1>
+  <p>现在在网站上直接交卡，当场看分数，周一 18:00 自动出榜。</p>
+  <p>新地址：http://49.234.30.12/</p>
+  <a href="http://49.234.30.12/">去新网站</a>
 </main>
-
-<nav class="tabbar" aria-label="快速跳转">
-  <a href="#me-section">我的</a>
-  <a href="#board-section">榜单</a>
-  <a href="#card-section">交卡</a>
-  <a href="#rules">规则</a>
-</nav>
-
-<dialog id="poster-dialog" class="poster-dialog">
-  <img id="poster-img" alt="战报图">
-  <p class="hint">手机上长按图片保存</p>
-  <div class="dlg-btns"><a id="poster-dl" class="btn btn-sun" download>下载</a><button type="button" class="btn btn-ghost-d" data-close>关闭</button></div>
-</dialog>
-
-<script src="js/score.js?v=1105d"></script>
-<script src="js/poster.js?v=1105d"></script>
-<script src="js/app.js?v=1105d"></script>
-<script src="js/card.js?v=1105d"></script>
-<script src="js/me.js?v=1105d"></script>
 </body>
 </html>
