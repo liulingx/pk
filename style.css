@@ -252,3 +252,57 @@ footer { margin-top: 56px; font-size: 13px; color: var(--ink-3); text-align: cen
   *, *::before, *::after { animation: none !important; transition: none !important; }
   html { scroll-behavior: auto; }
 }
+
+/* ---------- 我的 ---------- */
+.me { background: #fff; border-radius: 22px; padding: 18px; box-shadow: 0 2px 18px rgba(27, 21, 48, .07); display: grid; gap: 14px; }
+.me a { color: var(--sun-c); font-weight: 700; }
+.me-pick { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.me-pick select { flex: 1; padding: 9px 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--paper); font-size: 16px; }
+.me-head { display: flex; align-items: center; gap: 12px; }
+.me-head b { font-size: 19px; }
+.me-head small { display: block; font-size: 13px; color: var(--ink-2); }
+.me-due { padding: 12px 14px; border-radius: 14px; background: linear-gradient(90deg, rgba(58, 123, 213, .12), rgba(58, 123, 213, .03)); font-size: 15px; }
+.me-due b { font: 700 24px/1 var(--num); color: var(--sky-c); margin: 0 2px; }
+.me-due small { display: block; font-size: 12px; color: var(--ink-2); }
+.me-due.hot { background: linear-gradient(90deg, rgba(255, 122, 61, .2), rgba(255, 122, 61, .04)); }
+.me-due.hot b { color: var(--sun-c); }
+.me-score { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; text-align: center; }
+.me-score .big { display: block; font: 700 32px/1 var(--num); }
+.me-score .big em { font-style: normal; font-size: .5em; color: var(--ink-3); }
+.me-score .s { color: var(--sky-c); }
+.me-score .g { color: var(--sun-c); }
+.me-score small { font-size: 12px; color: var(--ink-2); }
+.me > .btn.small { justify-self: start; }
+.me-goals h3 { font-size: 16px; font-weight: 800; }
+.me-goals h3 small { display: block; font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.me-goal { padding: 10px 12px; border-radius: 14px; background: var(--paper); margin-top: 8px; }
+.me-goal p { font-size: 15px; line-height: 1.5; }
+.me-goal p small { display: block; font-size: 12px; color: var(--ink-2); }
+.me-proj { margin-top: 10px; font-size: 14px; color: var(--ink-2); }
+.me-proj b { font: 700 22px var(--num); color: var(--sun-c); }
+.me-empty { color: var(--ink-2); font-size: 15px; }
+.me-tip { font-size: 13px; color: var(--ink-2); padding: 10px 12px; border-radius: 12px; background: var(--paper-2); }
+.me-link { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 10px; align-items: center; font-size: 12px; color: var(--ink-2); }
+.me-link span { grid-column: 1 / -1; }
+.me-link code { font: 12px var(--mono); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; user-select: all; -webkit-user-select: all; }
+
+/* 交卡里的小工具 */
+.link-btn { border: 0; background: none; padding: 6px 0 0; color: var(--sky-c); font-size: 13px; font-weight: 700; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+.apps { margin-top: 8px; padding: 10px 12px; border-radius: 14px; background: var(--paper); display: grid; gap: 8px; }
+.app { display: grid; grid-template-columns: minmax(0, 1fr) 64px auto 64px auto; align-items: center; gap: 6px; font-size: 14px; color: var(--ink-2); }
+.app > span:first-child { color: var(--ink); font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-form .app input { margin: 0; padding: 8px; background: #fff; }
+.seg button:disabled { opacity: .45; cursor: not-allowed; }
+.card-next { margin-top: 14px; padding: 14px 16px; border-radius: 14px; background: rgba(58, 123, 213, .1); font-size: 14px; }
+.card-next ol { margin: 6px 0 0; padding-left: 1.3em; }
+
+/* 底部导航：手机上一只手就能跳 */
+.tabbar {
+  position: fixed; z-index: 10; left: 50%; bottom: calc(10px + env(safe-area-inset-bottom)); transform: translateX(-50%);
+  display: flex; gap: 2px; padding: 5px; border-radius: 99px; width: min(calc(100vw - 32px), 400px);
+  background: rgba(27, 21, 48, .82); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); box-shadow: 0 8px 24px rgba(27, 21, 48, .25);
+}
+.tabbar a { flex: 1; text-align: center; padding: 9px 0; border-radius: 99px; color: rgba(255, 255, 255, .78); text-decoration: none; font-size: 14px; font-weight: 700; }
+.tabbar a.on { background: #fff; color: var(--ink); }
+.day { padding-bottom: 110px; }
+.day section { scroll-margin-top: 12px; }

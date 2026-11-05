@@ -6,7 +6,7 @@
 <title>互卷周赛</title>
 <meta name="description" content="每周一交一张卡，比两件事：手机娱乐少刷了多少，说好的三件事做成了几件。">
 <meta name="theme-color" content="#0b1030">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=1105d">
 </head>
 <body>
 <header class="sky" id="sky">
@@ -23,13 +23,20 @@
     <p class="tagline" id="tagline"></p>
     <dl class="stats" id="stats"></dl>
     <nav class="cta">
-      <a href="#board-section" class="btn btn-sun">看榜</a>
-      <a href="#card-section" class="btn btn-ghost">交卡</a>
+      <a href="#card-section" class="btn btn-sun">交卡</a>
+      <a href="#rules" class="btn btn-ghost">怎么玩</a>
     </nav>
   </div>
 </header>
 
 <main class="day">
+  <section id="me-section">
+    <div class="sec-head">
+      <h2>我的</h2>
+    </div>
+    <div id="me" class="me"></div>
+  </section>
+
   <section id="board-section">
     <div class="sec-head">
       <h2 id="board-title">本周榜</h2>
@@ -54,6 +61,43 @@
       <p class="sec-sub">周一立下，下周一交证据</p>
     </div>
     <div id="pledges" class="pledges"></div>
+  </section>
+
+
+
+
+  <section id="card-section">
+    <div class="sec-head">
+      <h2>交卡</h2>
+      <p class="sec-sub">填完复制到群里。草稿只存在你自己的浏览器里</p>
+    </div>
+    <form id="card" class="card-form" autocomplete="off">
+      <div class="seg" role="tablist">
+        <button type="button" data-mode="join" class="on">第一次 · 加入卡</button>
+        <button type="button" data-mode="week">每周一 · 周一卡</button>
+      </div>
+      <div class="row2">
+        <label>昵称<input name="name" maxlength="12" placeholder="上榜用的名字"></label>
+        <label>头像编号<select name="avatar"></select></label>
+      </div>
+      <fieldset class="only-join">
+        <legend>基线：加入前那一整周</legend>
+        <label>娱乐清单<input name="list" maxlength="60" placeholder="例：抖音、B站、王者荣耀、短剧"></label>
+        <div class="hm"><span class="hm-l">清单合计</span><input name="bh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="基线周合计小时"><span>小时</span><input name="bm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="基线周合计分钟"><span>分钟</span></div>
+      </fieldset>
+      <fieldset class="only-week">
+        <legend id="last-legend">上周</legend>
+        <div class="hm"><span class="hm-l">清单合计</span><input name="wh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="上周合计小时"><span>小时</span><input name="wm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="上周合计分钟"><span>分钟</span></div>
+        <div id="last-goals"></div>
+      </fieldset>
+      <fieldset>
+        <legend id="next-legend">这周的 3 件事</legend>
+        <div id="next-goals"></div>
+      </fieldset>
+      <pre id="card-out" class="card-out" aria-live="polite"></pre>
+      <button type="button" id="copy" class="btn btn-sun wide">复制这张卡</button>
+      <div id="card-next" class="card-next" hidden></div>
+    </form>
   </section>
 
   <section id="rules">
@@ -111,39 +155,6 @@
     </ol>
   </section>
 
-  <section id="card-section">
-    <div class="sec-head">
-      <h2>交卡</h2>
-      <p class="sec-sub">填完复制到群里。草稿只存在你自己的浏览器里</p>
-    </div>
-    <form id="card" class="card-form" autocomplete="off">
-      <div class="seg" role="tablist">
-        <button type="button" data-mode="join" class="on">第一次 · 加入卡</button>
-        <button type="button" data-mode="week">每周一 · 周一卡</button>
-      </div>
-      <div class="row2">
-        <label>昵称<input name="name" maxlength="12" placeholder="上榜用的名字"></label>
-        <label>头像编号<select name="avatar"></select></label>
-      </div>
-      <fieldset class="only-join">
-        <legend>基线：加入前那一整周</legend>
-        <label>娱乐清单<input name="list" maxlength="60" placeholder="例：抖音、B站、王者荣耀、短剧"></label>
-        <div class="hm"><span class="hm-l">清单合计</span><input name="bh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="基线周合计小时"><span>小时</span><input name="bm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="基线周合计分钟"><span>分钟</span></div>
-      </fieldset>
-      <fieldset class="only-week">
-        <legend id="last-legend">上周</legend>
-        <div class="hm"><span class="hm-l">清单合计</span><input name="wh" type="number" min="0" max="168" inputmode="numeric" placeholder="0" aria-label="上周合计小时"><span>小时</span><input name="wm" type="number" min="0" max="59" inputmode="numeric" placeholder="0" aria-label="上周合计分钟"><span>分钟</span></div>
-        <div id="last-goals"></div>
-      </fieldset>
-      <fieldset>
-        <legend id="next-legend">这周的 3 件事</legend>
-        <div id="next-goals"></div>
-      </fieldset>
-      <pre id="card-out" class="card-out" aria-live="polite"></pre>
-      <button type="button" id="copy" class="btn btn-sun wide">复制这张卡</button>
-    </form>
-  </section>
-
   <section id="join-section" class="join">
     <h2>想加入</h2>
     <p id="join"></p>
@@ -155,15 +166,23 @@
   </footer>
 </main>
 
+<nav class="tabbar" aria-label="快速跳转">
+  <a href="#me-section">我的</a>
+  <a href="#board-section">榜单</a>
+  <a href="#card-section">交卡</a>
+  <a href="#rules">规则</a>
+</nav>
+
 <dialog id="poster-dialog" class="poster-dialog">
   <img id="poster-img" alt="战报图">
   <p class="hint">手机上长按图片保存</p>
   <div class="dlg-btns"><a id="poster-dl" class="btn btn-sun" download>下载</a><button type="button" class="btn btn-ghost-d" data-close>关闭</button></div>
 </dialog>
 
-<script src="js/score.js"></script>
-<script src="js/poster.js"></script>
-<script src="js/app.js"></script>
-<script src="js/card.js"></script>
+<script src="js/score.js?v=1105d"></script>
+<script src="js/poster.js?v=1105d"></script>
+<script src="js/app.js?v=1105d"></script>
+<script src="js/card.js?v=1105d"></script>
+<script src="js/me.js?v=1105d"></script>
 </body>
 </html>
